@@ -3,19 +3,39 @@ SELECT *
   FROM divtbl;
 
 -- 서브쿼리 - 성능이 떨어지는 영향(안좋음)
-SELECT b.Author AS '저자' --1
-    -- b.Division AS 
+SELECT b.Author AS '저자' -- 1
+    -- b.Division AS '장르'  --2
+     , (SELECT Names
+          FROM divtbl
+				WHERE Division = b.Division) AS '장르'
+		, b.Names AS '책제목'    -- 3
+        , b.ISBN
+        , b.Price AS '금액'
+  FROM bookstbl AS b
+ ORDER BY b.Names ASC;  -- 책제목, 3 => b.Names 대신 사용
+ 
+ -- 조인 - 서브쿼리 쓸 바에는 조인으로 변경하라
+SELECT b.Author AS'저자'
+  -- , b.Division
+	 , d.Names AS '장르'
+     , b.Names AS '책제목'
+     , b.ISBN
+     , b.Price AS '금액'
+  FROM bookstbl AS b
+ INNER JOIN divtbl AS d
+    ON b.Division = d.Division
+ ORDER BY b.Names;
 
 -- 서브쿼리 - 장르로 그룹핑
 SELECT (SELECT Names 
-	      FROM divitbl 
+	      FROM divtbl 
 		 WHERE Division = bb.Division) AS '장르' 
-	 , bb.chdgkq
+	 , bb.총합
   FROM (
-		SELECT b.Division
-			 , SUM(b.Price) AS '총합'
-		  FROM bookstbl AS b
-		 GROUP BY b.Division
+			SELECT b.Division
+				 , SUM(b.Price) AS '총합'
+			  FROM bookstbl AS b
+			 GROUP BY b.Division
 	   ) AS bb;
        
 -- 조인
@@ -39,7 +59,7 @@ SELECT m.Names '이름'
  
 -- 책을 두권 이상 출판한 저자
 SELECT bb.Author, bb.Division
-     , d.Name As'장르', bb.출판권수, bb.합계금액
+     , d.Names As'장르', bb.출판권수, bb.합계금액
   FROM(
 		SELECT b.Author
 			 , b.Division

@@ -12,7 +12,7 @@ SELECT userID
      , SUM(price * amount) AS 합산
   FROM buytbl
  GROUP BY userID
-HAVING SUM(price * amount) >= 1000;
+HAVING 합산 >= 1000;
 
 -- ROLLUP 전체합계 자동계산
 SELECT userID
@@ -21,12 +21,3 @@ SELECT userID
  GROUP BY userID
   WITH ROLLUP;
 
-
-SELECT o.userID
-     , SUM(o.합산)
-  FROM (
-        SELECT userID
-             , SUM(price * amount) AS '합산'
-          FROM buytbl
-		GROUP BY userID
-		) AS o
